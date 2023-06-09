@@ -1,7 +1,9 @@
 import { Button } from "@mui/material"
 import { Link } from "react-router-dom"
 
+
 const CourseCard = ({course}) => {
+
   return (
     <article>
       <p>{course.subject}</p>

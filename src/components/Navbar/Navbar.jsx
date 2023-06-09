@@ -65,11 +65,11 @@ const Navbar = () => {
                 <Typography textAlign="center">Crear Curso</Typography>
               </MenuItem>
             </Link>
-            <Link href="/students" color="inherit">
+            {/*<Link href="/students" color="inherit">
               <MenuItem>
                 <Typography textAlign="center">Modificar Alumnos</Typography>
               </MenuItem>
-            </Link>
+            </Link>*/}
               
           </Menu>
         </Box>
@@ -103,11 +103,11 @@ const Navbar = () => {
                 <Typography textAlign="center">Crear Curso</Typography>
               </MenuItem>
             </Link>
-            <Link href="/students" color="inherit">
+            {/*<Link href="/students" color="inherit">
               <MenuItem>
                 <Typography textAlign="center">Modificar Alumnos</Typography>
               </MenuItem>
-            </Link>
+            </Link>*/}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">

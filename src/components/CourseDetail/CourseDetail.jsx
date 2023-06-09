@@ -1,3 +1,4 @@
+import { Button, Link } from '@mui/material'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
@@ -19,6 +20,19 @@ const CourseDetail = () => {
       })
     isLoading = false
   },[])
+  const [bestStudent, setBestStudent]=useState({})
+  const getBest =()=>{
+    axios(`http://localhost:3000/api/students/outstanding?subject=${courseDetails.subject}`)
+    .then((data)=>{
+      console.log(data);
+      setBestStudent(data.data)
+    })
+    .catch(error=>{
+      console.log(error);
+    })
+  }
+
+
 
   if (isLoading) {
     return <h3>Cargando</h3>
@@ -47,6 +61,9 @@ const CourseDetail = () => {
             </ul>)
           })}
         </div>
+        <Link href={`/students/${courseDetails.subject}`}>Editar alumnos</Link>
+        <Button onClick={getBest}>Obtener alumno destacado</Button>
+        {bestStudent.name ? <h4>El alumno destacado es: {bestStudent.name}</h4> : <></>}
       </div> : <h2>Loading...</h2>}
     </div>
   )

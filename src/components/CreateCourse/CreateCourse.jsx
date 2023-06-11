@@ -1,8 +1,11 @@
 import { useState } from "react"
 import axios from "axios"
-
+import { Navigate } from "react-router-dom"
 
 const CreateCourse = () => {
+
+  const token = localStorage.getItem("token")
+
 
   const [input, setInput] = useState({
     subject: "",
@@ -30,8 +33,15 @@ const CreateCourse = () => {
       })
     }
 
+    if(!token){
+      return(
+        <Navigate to='/login'/>
+      )
+    }
+
   return (
     <main>
+      
       <hr />
       <hr />
       <hr />

@@ -24,6 +24,10 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
+  const logout = () => {
+    localStorage.clear()
+  }
+
   return (
     <AppBar position="fixed" color="primary">
       <Toolbar>
@@ -131,7 +135,7 @@ const Navbar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <Link href='/login' color='inherit'>
+              <Link href='/login' color='inherit' onClick={logout}>
                 <MenuItem>
                   <Typography textAlign="center">Cerrar sesión</Typography>
                 </MenuItem>

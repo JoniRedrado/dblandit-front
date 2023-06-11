@@ -1,8 +1,11 @@
 import {useState, useEffect} from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 import axios from 'axios'
+import { Button } from '@mui/material'
 
 const ModifyStudents = () => {
+
+  const token = localStorage.getItem("token")
 
   const [courseDetails, setCourseDetails] = useState({})
   const [documentNumber, setDocumentNumber] = useState("")
@@ -24,9 +27,9 @@ const ModifyStudents = () => {
     setDocumentNumber(e.target.value)
   }
 
-  const deleteStudent = (e)=>{
-    e.preventDefault()
-    axios.delete(`http://localhost:3000/api/students?subject=${subject}&documentNumber=${documentNumber}`)
+  const deleteStudent = (e, dni= documentNumber)=>{
+    if(e !== null) e.preventDefault()
+    axios.delete(`http://localhost:3000/api/students?subject=${subject}&documentNumber=${dni}`,  {headers:{'token': token}})
       .then(res=>{
         console.log(res);
       })
@@ -50,7 +53,7 @@ const ModifyStudents = () => {
     e.preventDefault()
     console.log(newStudent);
 
-    axios.post('http://localhost:3000/api/students', {...newStudent, subject: courseDetails.subject})
+    axios.post('http://localhost:3000/api/students', {data:{...newStudent}, subject: courseDetails.subject,  headers:{'token': token}})
       .then(res=>{
         console.log(res);
       })
@@ -68,7 +71,7 @@ const ModifyStudents = () => {
 
   useEffect(()=>{
     isLoading = true
-    axios(`http://localhost:3000/api/courses/detail?subject=${subject}`)
+    axios(`http://localhost:3000/api/courses/detail?subject=${subject}`,  {headers:{'token': token}})
       .then((data)=>{
         setCourseDetails(data.data)
       })
@@ -84,6 +87,7 @@ const ModifyStudents = () => {
 
   return (
     <div>
+      {!token && <Navigate to='/login'/>}
       <hr />
       <hr />
       <hr />
@@ -93,7 +97,12 @@ const ModifyStudents = () => {
       <ul>
         {courseDetails.students?.map((student)=>{
           return(
-            <li key={student.documentNumber}>{student.name} {student.surname}</li>
+            <li key={student.documentNumber}>
+              <p>{student.name}</p>
+              <p>{student.surname}</p>
+              <p>{student.documentNumber}</p>
+              <Button onClick={()=>deleteStudent(null, student.documentNumber)}>Eliminar alumno</Button>
+            </li>
           )
         })}
       </ul>

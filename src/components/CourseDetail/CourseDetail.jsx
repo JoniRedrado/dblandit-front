@@ -1,9 +1,11 @@
 import { Button, Link } from '@mui/material'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 const CourseDetail = () => {
+
+  const token = localStorage.getItem("token")
 
   const [courseDetails, setCourseDetails] = useState({})
   let {subject} = useParams()
@@ -11,7 +13,7 @@ const CourseDetail = () => {
 
   useEffect(()=>{
     isLoading = true
-    axios(`http://localhost:3000/api/courses/detail?subject=${subject}`)
+    axios(`http://localhost:3000/api/courses/detail?subject=${subject}`,  {headers:{'token': token}})
       .then((data)=>{
         setCourseDetails(data.data)
       })
@@ -22,7 +24,7 @@ const CourseDetail = () => {
   },[])
   const [bestStudent, setBestStudent]=useState({})
   const getBest =()=>{
-    axios(`http://localhost:3000/api/students/outstanding?subject=${courseDetails.subject}`)
+    axios(`http://localhost:3000/api/students/outstanding?subject=${courseDetails.subject}`, {headers:{'token': token}})
     .then((data)=>{
       console.log(data);
       setBestStudent(data.data)
@@ -40,6 +42,7 @@ const CourseDetail = () => {
   console.log(courseDetails.students)
   return (
     <div>
+      {!token && <Navigate to='/login'/>}
       <hr />
       <hr />
       <hr />

@@ -3,7 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -11,14 +10,14 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+
 
 
 const defaultTheme = createTheme();
 
-export default function Signup() {
+export default function NewCourse() {
   
-  const navigate = useNavigate()
   const [inputs, setInputs] = useState(
     {
       username: "",
@@ -27,21 +26,34 @@ export default function Signup() {
     }
   )
   
-  const handleChange = (e) => {
-    setInputs({...inputs, [e.target.name]: e.target.value})
+  const token = localStorage.getItem("token")
+  if(!token){
+    return(
+      <Navigate to='/login'/>
+    )
   }
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    axios.post('http://localhost:3000/api/user/signup', inputs)
-    .then(res=>{
-      localStorage.setItem("token", res.data.token)
-      navigate('/courses')
-    })
-    .catch(error=>{
-      console.log(error);
-    })
-  };
+  const handleChange = (e) => {
+    setInputs({...inputs, [e.target.name]: e.target.value})
+    
+  }
+
+  const handleSubmit = (e)=>{
+    e.preventDefault()
+    console.log(inputs, token);
+    axios.post('http://localhost:3000/api/courses', inputs, {headers:{'token': token}})
+      .then(res=>{
+        console.log(res)
+      })
+      .catch(error=>{
+        console.log(error);
+      })
+      setInputs({
+        subject: "",
+        duration: "",
+        year: ""
+      })
+    }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -59,43 +71,44 @@ export default function Signup() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Crear curso nuevo
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
-                  autoComplete="given-name"
-                  name="username"
+                  name="subject"
                   required
                   fullWidth
-                  id="username"
-                  label="Username"
+                  id="subject"
+                  label="Tema"
                   autoFocus
                   onChange={handleChange}
+                  value={inputs.subject}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  name="duration"
+                  required
+                  fullWidth
+                  id="duration"
+                  label="Duración en meses"
+                  type='number'
+                  onChange={handleChange}
+                  value={inputs.duration}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
+                  name="year"
+                  label="Año que se dictó"
+                  type="number"
+                  id="year"
                   onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  onChange={handleChange}
+                  value={inputs.year}
                 />
               </Grid>
             </Grid>
@@ -105,15 +118,8 @@ export default function Signup() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Agregar curso
             </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="/login" variant="body2">
-                  Already have an account? Sign in
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
       </Container>

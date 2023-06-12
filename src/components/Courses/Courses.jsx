@@ -2,7 +2,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import { Button } from "@mui/material"
 import CourseCard from "../CourseCard/CourseCard"
-import { Navigate, useNavigate } from "react-router-dom"
+import { Navigate } from "react-router-dom"
 
 
 const Courses = () => {

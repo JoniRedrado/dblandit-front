@@ -6,19 +6,19 @@ import { useState } from 'react';
 
 const Navbar = () => {
 
-  const [anchorElNav, setAnchorElNav] = useState(null);
+  //const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
-  const handleOpenNavMenu = (event) => {
+  /*const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
-  };
+  };*/
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
+  /*const handleCloseNavMenu = () => {
     setAnchorElNav(null);
-  };
+  };*/
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
@@ -32,7 +32,7 @@ const Navbar = () => {
     <AppBar position="fixed" color="primary">
       <Toolbar>
         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-          <IconButton
+          {/*<IconButton
             size="large"
             aria-label="account of current user"
             aria-controls="menu-appbar"
@@ -69,13 +69,13 @@ const Navbar = () => {
                 <Typography textAlign="center">Crear Curso</Typography>
               </MenuItem>
             </Link>
-            {/*<Link href="/students" color="inherit">
+            <Link href="/students" color="inherit">
               <MenuItem>
                 <Typography textAlign="center">Modificar Alumnos</Typography>
               </MenuItem>
-            </Link>*/}
+            </Link>
               
-          </Menu>
+          </Menu>*/}
         </Box>
         <AdbIcon sx={{ display: { xs: 'flex', md: 'flex' }, mr: 1 }} />
           <Typography
@@ -96,7 +96,7 @@ const Navbar = () => {
           >
             DBLandIT
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          {/*<Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
           <Link href="/courses" color="inherit">
               <MenuItem>
                 <Typography textAlign="center">Cursos</Typography>
@@ -107,12 +107,12 @@ const Navbar = () => {
                 <Typography textAlign="center">Crear Curso</Typography>
               </MenuItem>
             </Link>
-            {/*<Link href="/students" color="inherit">
+            <Link href="/students" color="inherit">
               <MenuItem>
                 <Typography textAlign="center">Modificar Alumnos</Typography>
               </MenuItem>
-            </Link>*/}
-          </Box>
+            </Link>
+          </Box>*/}
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

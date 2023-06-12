@@ -4,14 +4,18 @@ import { Navigate } from "react-router-dom"
 
 const CreateCourse = () => {
 
-  const token = localStorage.getItem("token")
-
-
   const [input, setInput] = useState({
     subject: "",
     duration: "",
     year: ""
   })
+
+  const token = localStorage.getItem("token")
+  if(!token){
+    return(
+      <Navigate to='/login'/>
+    )
+  }
 
   const handleChange = (e) => {
     setInput({...input, [e.target.name]: e.target.value})
@@ -19,7 +23,7 @@ const CreateCourse = () => {
 
   const handleSubmit = (e)=>{
     e.preventDefault()
-    axios.post('http://localhost:3000/api/courses', input)
+    axios.post('http://localhost:3000/api/courses', {headers:{'token': token}, body: input})
       .then(res=>{
         console.log(res)
       })

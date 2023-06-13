@@ -12,7 +12,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import { signUpValidation } from '../../../validations';
 
 const defaultTheme = createTheme();
 
@@ -28,8 +28,13 @@ export default function Signup() {
       password: ""
     }
   )
+  const [error, setError] = useState({})
+
   const handleChange = (e) => {
     setInputs({...inputs, [e.target.name]: e.target.value})
+    setError(
+      signUpValidation({...inputs, [e.target.name]: e.target.value})
+    )
   }
 
   //Sign Up
@@ -76,6 +81,9 @@ export default function Signup() {
                   autoFocus
                   onChange={handleChange}
                 />
+                {error.username && <Typography component="label" variant="p">
+            {error.username}
+            </Typography>}
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -87,6 +95,9 @@ export default function Signup() {
                   autoComplete="email"
                   onChange={handleChange}
                 />
+                {error.email && <Typography component="label" variant="p">
+                {error.email}
+                </Typography>}
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -99,6 +110,9 @@ export default function Signup() {
                   autoComplete="new-password"
                   onChange={handleChange}
                 />
+                {error.password && <Typography component="label" variant="p">
+                {error.password}
+                </Typography>}
               </Grid>
             </Grid>
             <Button

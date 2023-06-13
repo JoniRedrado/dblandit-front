@@ -104,6 +104,10 @@ const ModifyStudents = () => {
     
   },[deleteStudent, addStudent])
 
+  const goBack = ()=>{
+    return(<Navigate to={`/courses`} />)
+  }
+
   if(!token){
     return(
       <Navigate to='/login'/>
@@ -129,16 +133,18 @@ const ModifyStudents = () => {
             pb: 6,
           }}
         >
-          <Container maxWidth="sm">
-            <Typography
-              component="h1"
-              variant="h2"
-              align="center"
-              color="text.primary"
-              gutterBottom
-            >
-              Tema: {courseDetails.subject}
-            </Typography>
+          <Container maxWidth="sm" style={{textAlign:"center"}} >
+            <Button href={`/courses/${courseDetails.subject}`} >
+              <Typography
+                component="h1"
+                variant="h2"
+                align="center"
+                color="text.primary"
+                gutterBottom
+              >
+                Tema: {courseDetails.subject}
+              </Typography>
+            </Button>
           </Container>
         </Box>
         <Container sx={{ py: 8 }} maxWidth="md">

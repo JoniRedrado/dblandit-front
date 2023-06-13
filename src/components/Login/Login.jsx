@@ -12,7 +12,9 @@ import Container from '@mui/material/Container';
 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { red } from '@mui/material/colors';
 
+import { loginValidation } from '../../../validations';
 
 export default function Login() {
 
@@ -24,8 +26,14 @@ export default function Login() {
     password: ""
   })
 
+  const [ error, setError ] = useState({})
+
   const handleChange = (e)=>{
     setInputs({...inputs, [e.target.name]: e.target.value})
+    setError(
+      loginValidation({...inputs, [e.target.name]: e.target.value})
+    )
+    
   }
 
   const handleSubmit = (event) => {
@@ -37,6 +45,7 @@ export default function Login() {
       navigate('/')
     })
     .catch(error=>{
+      setError({...error, credentials: "Crendenciales incorrectas!"})
       console.log(error);
     })
   };
@@ -70,6 +79,9 @@ export default function Login() {
               autoFocus
               onChange={handleChange}
             />
+            {error.email && <Typography component="label" variant="p">
+            {error.email}
+            </Typography>}
             <TextField
               margin="normal"
               required
@@ -81,6 +93,14 @@ export default function Login() {
               autoComplete="current-password"
               onChange={handleChange}
             />
+
+            {error.password && <Typography component="label" variant="p">
+            {error.password}
+            </Typography>}
+
+            {error.credentials && <Typography component="label" variant="p" color={red[500]}>
+            {error.credentials}
+            </Typography>}
             <Button
               type="submit"
               fullWidth

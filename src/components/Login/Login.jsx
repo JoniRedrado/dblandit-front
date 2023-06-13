@@ -17,12 +17,12 @@ import { useNavigate } from 'react-router-dom';
 export default function Login() {
 
   const navigate = useNavigate()
-
+  
+  //Login
   const [inputs, setInputs] = useState({
     email: "",
     password: ""
   })
-
 
   const handleChange = (e)=>{
     setInputs({...inputs, [e.target.name]: e.target.value})
@@ -33,7 +33,7 @@ export default function Login() {
     
     axios.post('http://localhost:3000/api/user/login', inputs)
     .then(res=>{
-      localStorage.setItem("token", res.data.token)
+      sessionStorage.setItem("token", res.data.token)
       navigate('/')
     })
     .catch(error=>{

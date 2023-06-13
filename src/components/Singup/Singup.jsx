@@ -19,6 +19,8 @@ const defaultTheme = createTheme();
 export default function Signup() {
   
   const navigate = useNavigate()
+  
+  //State inputs & handleChange
   const [inputs, setInputs] = useState(
     {
       username: "",
@@ -26,17 +28,17 @@ export default function Signup() {
       password: ""
     }
   )
-  
   const handleChange = (e) => {
     setInputs({...inputs, [e.target.name]: e.target.value})
   }
 
+  //Sign Up
   const handleSubmit = (event) => {
     event.preventDefault();
     axios.post('http://localhost:3000/api/user/signup', inputs)
     .then(res=>{
-      localStorage.setItem("token", res.data.token)
-      navigate('/courses')
+      sessionStorage.setItem("token", res.data.token)
+      navigate('/')
     })
     .catch(error=>{
       console.log(error);

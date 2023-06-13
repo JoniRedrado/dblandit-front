@@ -6,16 +6,13 @@ import CameraIcon from '@mui/icons-material/PhotoCamera';
 //import CardActions from '@mui/material/CardActions';
 //import CardContent from '@mui/material/CardContent';
 import CssBaseline from '@mui/material/CssBaseline';
-//import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-//import { TextField } from '@mui/material';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-//import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 
 
@@ -24,8 +21,10 @@ import axios from 'axios';
 
 const CourseDetail = () => {
 
-  const token = localStorage.getItem("token")
+  //Get token
+  const token = sessionStorage.getItem("token")
 
+  //State courseDetails 6 GET
   const [courseDetails, setCourseDetails] = useState({})
 
   let {subject} = useParams()
@@ -36,25 +35,38 @@ const CourseDetail = () => {
         setCourseDetails(data.data)
       })
       .catch(error=>{
+        if (error.response.status === 401){
+          sessionStorage.clear()
+          return (<Navigate to='/login'/>)
+        }
         alert("No se pudo obtener el curso...", error)
       })
   },[])
   
-  //const [ bestStudent, setBestStudent ] = useState({})
 
+  //Get outstanding student
+  //const [ bestStudent, setBestStudent ] = useState({})
   const getBest =()=>{
     axios(`http://localhost:3000/api/students/outstanding?subject=${courseDetails.subject}`, {headers:{'token': token}})
     .then((data)=>{
       //setBestStudent(data.data)
-      alert(`El alumno destacado fue ${data.data.name} ${data.data.surname} y su nota fue ${data.data.grade}`)
+      if(!data.data) {
+        alert('No hay nigun alumno.')
+      } else {
+        alert(`El alumno destacado fue ${data.data.name} ${data.data.surname} y su nota fue ${data.data.grade}`)
+      }
     })
     .catch(error=>{
+      if (error.response.status === 401){
+        sessionStorage.clear()
+        return (<Navigate to='/login'/>)
+      }
       console.log(error);
     })
   }
 
 
-
+  //Token validation
   if(!token){
     return(
       <Navigate to='/login'/>
@@ -73,7 +85,7 @@ const CourseDetail = () => {
         </Toolbar>
       </AppBar>
       <main>
-        {/* Hero unit */}
+        
         <Box
           sx={{
             bgcolor: 'background.paper',
@@ -81,7 +93,7 @@ const CourseDetail = () => {
             pb: 6,
           }}
         >
-          <Container maxWidth="sm">
+          <Container maxWidth="sm" style={{display: "flex", flexDirection:"column" , justifyContent: "center", alignItems:"center"}}>
             <Typography
               component="h1"
               variant="h2"
@@ -112,12 +124,13 @@ const CourseDetail = () => {
             >
               {courseDetails.students?.map((student) => (
                 <li key={student.documentNumber}>
-                  <ul>
-                    <ListSubheader>{student.name} {student.surname}</ListSubheader>
+                  <ul style={{display: "flex",flexDirection:"column", justifyContent: "center", alignItems:"center"}} >
+                    <ListSubheader style={{fontSize: "1.3rem"}}>{student.name} {student.surname}</ListSubheader>
                       <ListItem>DNI: {student.documentNumber}</ListItem>
                       <ListItem>Direccio {student.address}</ListItem>
                       <ListItem>Nota: {student.grade}</ListItem>
                   </ul>
+                  <hr />
                 </li>
               ))}
             </List>
@@ -133,39 +146,24 @@ const CourseDetail = () => {
             </Stack>
           </Container>
         </Box>
+        
+        <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
+          <Typography variant="h6" align="center" gutterBottom>
+            DBLandIT
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            align="center"
+            color="text.secondary"
+            component="p"
+          >
+            Desarrollado por Jonathan Redrado
+          </Typography>
+        </Box>
+        
       </main>
     </>
   )
-
-  /*return (
-    <div>
-      <hr />
-      <hr />
-      <hr />
-      <hr />
-      <hr />
-      <hr />
-      {courseDetails.students ? <div>
-        <h3>Tema: {courseDetails.subject}</h3>
-        <p>Duracion: {courseDetails.duration} meses.</p>
-        <p>Año en que se dictó: {courseDetails.year}</p>
-        <div>
-          {courseDetails.students.map((student)=>{
-            return (<ul key={student.documentNumber}>
-              <li>Nombre: {student.name}</li>
-              <li>Apellido: {student.surname}</li>
-              <li>Dirección: {student.adress}</li>
-              <li>N° de documento: {student.documentNumber}</li>
-              <li>Nota final: {student.grade}</li>
-            </ul>)
-          })}
-        </div>
-        <Link href={`/students/${courseDetails.subject}`}>Editar alumnos</Link>
-        <Button onClick={getBest}>Obtener alumno destacado</Button>
-        {bestStudent.name ? <h4>El alumno destacado es: {bestStudent.name}</h4> : <></>}
-      </div> : <h2>Loading...</h2>}
-    </div>
-  )*/
 }
 
 export default CourseDetail

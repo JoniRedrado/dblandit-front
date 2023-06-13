@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import BookIcon from '@mui/icons-material/Book';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -18,6 +18,7 @@ const defaultTheme = createTheme();
 
 export default function NewCourse() {
   
+  //State inputs & handleChange
   const [inputs, setInputs] = useState(
     {
       username: "",
@@ -26,26 +27,24 @@ export default function NewCourse() {
     }
   )
   
-  const token = localStorage.getItem("token")
-  if(!token){
-    return(
-      <Navigate to='/login'/>
-    )
-  }
-
   const handleChange = (e) => {
     setInputs({...inputs, [e.target.name]: e.target.value})
     
   }
-
+  
+  //Add course
   const handleSubmit = (e)=>{
     e.preventDefault()
     console.log(inputs, token);
     axios.post('http://localhost:3000/api/courses', inputs, {headers:{'token': token}})
-      .then(res=>{
+    .then(res=>{
         console.log(res)
       })
       .catch(error=>{
+        if (error.response.status === 401){
+          sessionStorage.clear()
+          return (<Navigate to='/login'/>)
+        }
         console.log(error);
       })
       setInputs({
@@ -54,6 +53,14 @@ export default function NewCourse() {
         year: ""
       })
     }
+    
+    //Get token & validation
+    const token = sessionStorage.getItem("token")
+    if(!token){
+      return(
+        <Navigate to='/login'/>
+        )
+      }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -68,7 +75,7 @@ export default function NewCourse() {
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
+            <BookIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Crear curso nuevo
@@ -123,6 +130,21 @@ export default function NewCourse() {
           </Box>
         </Box>
       </Container>
+
+      <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
+        <Typography variant="h6" align="center" gutterBottom>
+          DBLandIT
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          align="center"
+          color="text.secondary"
+          component="p"
+        >
+          Desarrollado por Jonathan Redrado
+        </Typography>
+      </Box>
+
     </ThemeProvider>
   );
 }

@@ -1,32 +1,44 @@
-import {useState, useEffect} from 'react'
-import { useParams, Navigate } from 'react-router-dom'
-import axios from 'axios'
-import { Button } from '@mui/material'
+import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
+import CameraIcon from '@mui/icons-material/PhotoCamera';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { TextField } from '@mui/material';
+
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Navigate, useParams } from 'react-router-dom';
+
+const defaultTheme = createTheme();
 
 const ModifyStudents = () => {
 
-  const token = localStorage.getItem("token")
+  //Get token
+  const token = sessionStorage.getItem("token")
 
+  //States
   const [courseDetails, setCourseDetails] = useState({})
   const [documentNumber, setDocumentNumber] = useState("")
   const [newStudent, setNewStudent] = useState({
     name: "",
     surname: "",
     address: "",
-    documentNumber: undefined,
+    documentNumber: "",
     grade: "",
   })
 
+  //Delete student
   let {subject} = useParams()
-  let isLoading = false
-
-
-  //Eliminar alumno
-  //Se puede hacer poniendo un boton para cada alumno
-  const handleChange = (e)=>{
-    setDocumentNumber(e.target.value)
-  }
-
   const deleteStudent = (e, dni= documentNumber)=>{
     if(e !== null) e.preventDefault()
     axios.delete(`http://localhost:3000/api/students?subject=${subject}&documentNumber=${dni}`,  {headers:{'token': token}})
@@ -34,6 +46,10 @@ const ModifyStudents = () => {
         console.log(res);
       })
       .catch(error=>{
+        if (error.response.status === 401){
+          sessionStorage.clear()
+          return (<Navigate to='/login'/>)
+        }
         console.log(error);
       })
     setDocumentNumber("")
@@ -41,7 +57,7 @@ const ModifyStudents = () => {
 
   //Agregar alumno
   const handleNewStudent = (e)=>{
-    if (e.target.name === "documentNumber" ||e.target.name === "grade"){
+    if (e.target.name === "documentNumber" || e.target.name === "grade"){
       const number = e.target.value
       setNewStudent({...newStudent, [e.target.name]: parseInt(number)})
     } else {
@@ -51,82 +67,189 @@ const ModifyStudents = () => {
 
   const addStudent = (e)=>{
     e.preventDefault()
-    console.log(newStudent);
 
-    axios.post('http://localhost:3000/api/students', {data:{...newStudent}, subject: courseDetails.subject,  headers:{'token': token}})
+    axios.post('http://localhost:3000/api/students', {subject: courseDetails.subject, data:{...newStudent}}, {headers:{'token': token}})
       .then(res=>{
         console.log(res);
+        setNewStudent({
+          name: "",
+          surname: "",
+          address: "",
+          documentNumber: "",
+          grade: "",
+        })
       })
       .catch(error=>{
+        if (error.response.status === 401){
+          sessionStorage.clear()
+          return (<Navigate to='/login'/>)
+        }
         console.log(error);
       })
-    setNewStudent({
-      name: "",
-      surname: "",
-      address: "",
-      documentNumber: "",
-      grade: "",
-    })
   }
 
+  //Get courseDetails
   useEffect(()=>{
-    isLoading = true
     axios(`http://localhost:3000/api/courses/detail?subject=${subject}`,  {headers:{'token': token}})
       .then((data)=>{
         setCourseDetails(data.data)
       })
       .catch(error=>{
+        if (error.response.status === 401){
+          sessionStorage.clear()
+          return (<Navigate to='/login'/>)
+        }
         alert("No se pudo obtener el curso...", error)
       })
-    isLoading = false
+    
   },[deleteStudent, addStudent])
 
-  if (isLoading) {
-    return <h3>Cargando</h3>
+  if(!token){
+    return(
+      <Navigate to='/login'/>
+    )
   }
 
   return (
-    <div>
-      {!token && <Navigate to='/login'/>}
-      <hr />
-      <hr />
-      <hr />
-      <hr />
-      <hr />
-      <h3>{courseDetails.subject}</h3>
-      <ul>
-        {courseDetails.students?.map((student)=>{
-          return(
-            <li key={student.documentNumber}>
-              <p>{student.name}</p>
-              <p>{student.surname}</p>
-              <p>{student.documentNumber}</p>
-              <Button onClick={()=>deleteStudent(null, student.documentNumber)}>Eliminar alumno</Button>
-            </li>
-          )
-        })}
-      </ul>
-      <form onSubmit={deleteStudent}>
-        <label>Ingrese el DNI del alumno a eliminar:</label>
-        <input name='documentNumber' type='number' value={documentNumber} onChange={handleChange}/>
-        <button type='submit'>Eliminar</button>
-      </form>
-      <hr />
-      <form onSubmit={addStudent}>
-        <label>Nombre: </label>
-        <input type='text' name='name' value={newStudent.name} onChange={handleNewStudent}/>
-        <label>Apellido: </label>
-        <input type='text' name='surname' value={newStudent.surname} onChange={handleNewStudent}/>
-        <label>Dirección:</label>
-        <input type='text' name='address' value={newStudent.address} onChange={handleNewStudent}/>
-        <label>Numero de documento: </label>
-        <input type='number' name='documentNumber' value={newStudent.documentNumber} onChange={handleNewStudent}/>
-        <label>Nota final: </label>
-        <input type='number' name='grade' value={newStudent.grade} onChange={handleNewStudent}/>
-        <button type='submit'>Agregar alumno</button>
-      </form>
-    </div>
-  )
+    <ThemeProvider theme={defaultTheme}>
+      <CssBaseline />
+      <AppBar position="relative">
+        <Toolbar>
+          <CameraIcon sx={{ mr: 2 }} />
+          <Typography variant="h6" color="inherit" noWrap>
+            Tema: {courseDetails.subject}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      
+        <Box
+          sx={{
+            bgcolor: 'background.paper',
+            pt: 8,
+            pb: 6,
+          }}
+        >
+          <Container maxWidth="sm">
+            <Typography
+              component="h1"
+              variant="h2"
+              align="center"
+              color="text.primary"
+              gutterBottom
+            >
+              Tema: {courseDetails.subject}
+            </Typography>
+          </Container>
+        </Box>
+        <Container sx={{ py: 8 }} maxWidth="md">
+          <Grid container spacing={4} style={{justifyContent:"center"}}>
+            {courseDetails.students?.map((student) => (
+              <Grid item key={student.documentNumber} xs={12} sm={6} md={4}>
+                <Card
+                  sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                >
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography gutterBottom variant="h5" component="h2">
+                      {student.name} {student.surname}
+                    </Typography>
+                    <Typography>
+                      DNI: {student.documentNumber}
+                    </Typography>
+                    <Typography>
+                      Dirección: {student.address}
+                    </Typography>
+                    <Typography>
+                      Nota final: {student.grade}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small" onClick={()=>deleteStudent(null, student.documentNumber)}>Eliminar</Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+          <Grid component="form" onSubmit={addStudent}  noValidate sx={{ mt: 1, display: "flex", justifyContent: "space-around", py:"2rem" }} container spacing={4}>
+            <TextField
+              margin="normal"
+              value={newStudent.name}
+              id="name"
+              name="name"
+              label="Nombre"
+              type="text"
+              onChange={handleNewStudent}
+              item xs={12} sm={6} md={4}
+            />
+            <TextField
+              margin="normal"
+              value={newStudent.surname}
+              id="surname"
+              name="surname"
+              label="Apellido"
+              type="text"
+              onChange={handleNewStudent}
+              item xs={12} sm={6} md={4}
+              />
+            <TextField
+              margin="normal"
+              value={newStudent.address}
+              id="address"
+              name="address"
+              label="Domicilio"
+              type="text"
+              onChange={handleNewStudent}
+              item xs={12} sm={6} md={4}
+              />
+            <TextField
+              margin="normal"
+              value={newStudent.documentNumber}
+              id="documentNumber"
+              name="documentNumber"
+              label="DNI"
+              type="number"
+              onChange={handleNewStudent}
+              item xs={12} sm={6} md={4}
+              />
+            <TextField
+              margin="normal"
+              value={newStudent.grade}
+              id="grade"
+              name="grade"
+              label="Nota final"
+              type="number"
+              onChange={handleNewStudent}
+              item xs={12} sm={6} md={4}
+              />
+            <div style={{display: "flex", flexWrap:"wrap", justifyContent:"space-around"}}>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                style={{margin: '1rem'}}
+                >
+                Agregar
+              </Button>
+            </div>
+          </Grid>
+          
+        </Container>
+      
+      <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
+        <Typography variant="h6" align="center" gutterBottom>
+          DBLandIT
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          align="center"
+          color="text.secondary"
+          component="p"
+        >
+          Desarrollado por Jonathan Redrado
+        </Typography>
+      </Box>
+
+    </ThemeProvider>
+  );
 }
 
 export default ModifyStudents

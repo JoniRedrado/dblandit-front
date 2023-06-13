@@ -21,24 +21,40 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Navigate } from 'react-router-dom';
 
-
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Home() {
 
-  const token = localStorage.getItem("token")
-  
-  const [courses, setCourses] = useState([])
-  
-  
+  //Get token
+  const token = sessionStorage.getItem("token")
 
+  //State & get courses
+  const [courses, setCourses] = useState([])
+  useEffect(()=>{
+    axios('http://localhost:3000/api/courses', {headers:{'token': token}})
+      .then( (data)=>{
+        setCourses(data.data)
+      })
+      .catch(error=>{
+        if (error.response.status === 401){
+          sessionStorage.clear()
+          return (<Navigate to='/login'/>)
+        }
+        console.log(error);
+      })
+  },[token])
+
+  //Delete course
   const deleteCourse = (subject)=>{
     axios.delete(`http://localhost:3000/api/courses/subject/${subject}`, {headers:{'token': token}})
       .then(res=>{
         console.log(res);
       })
       .catch(error=>{
+        if (error.response.status === 401){
+          sessionStorage.clear()
+          return (<Navigate to='/login'/>)
+        }
         console.log(error);
       })
     axios('http://localhost:3000/api/courses', {headers:{'token': token}})
@@ -47,16 +63,7 @@ export default function Home() {
       })
   }
 
-
-
-  useEffect(()=>{
-    axios('http://localhost:3000/api/courses', {headers:{'token': token}})
-      .then( (data)=>{
-        
-        setCourses(data.data)
-      })
-  },[token])
-  
+  //Filter by...
   const [filters, setFilters] = useState({
     duration: "",
     year: "",
@@ -69,13 +76,15 @@ export default function Home() {
 
   const filter = (e)=>{
     e.preventDefault()
-    console.log(filters);
     axios(`http://localhost:3000/api/courses/?duration=${filters.duration}&year=${filters.year}`, {headers:{'token': token}})
     .then((data)=>{
-      console.log(data);
       setCourses(data.data)
     })
     .catch(error=>{
+      if (error.response.status === 401){
+        sessionStorage.clear()
+        return (<Navigate to='/login'/>)
+      }
       console.log(error);
     })
 
@@ -84,7 +93,8 @@ export default function Home() {
       year: "",
     })
   }
-  
+
+  //Token validation
   if(!token){
     return(
       <Navigate to='/login'/>
@@ -102,8 +112,7 @@ export default function Home() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <main>
-        {/* Hero unit */}
+      
         <Box
           sx={{
             bgcolor: 'background.paper',
@@ -182,7 +191,6 @@ export default function Home() {
             </div>
           </Grid>
           
-          {/* End hero unit */}
           <Grid container spacing={4}>
             {courses.map((course) => (
               <Grid item key={course._id} xs={12} sm={6} md={4}>
@@ -207,11 +215,11 @@ export default function Home() {
             ))}
           </Grid>
         </Container>
-      </main>
-      {/* Footer */}
+      
+
       <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
         <Typography variant="h6" align="center" gutterBottom>
-          Footer
+          DBLandIT
         </Typography>
         <Typography
           variant="subtitle1"
@@ -219,10 +227,10 @@ export default function Home() {
           color="text.secondary"
           component="p"
         >
-          Something here to give the footer a purpose!
+          Desarrollado por Jonathan Redrado
         </Typography>
       </Box>
-      {/* End footer */}
+
     </ThemeProvider>
   );
 }

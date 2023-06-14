@@ -2,9 +2,6 @@ import { Button, Link } from '@mui/material'
 import { useParams, Navigate } from 'react-router-dom'
 import AppBar from '@mui/material/AppBar';
 import CameraIcon from '@mui/icons-material/PhotoCamera';
-//import Card from '@mui/material/Card';
-//import CardActions from '@mui/material/CardActions';
-//import CardContent from '@mui/material/CardContent';
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
@@ -15,6 +12,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListSubheader from '@mui/material/ListSubheader';
 
+import Swal from 'sweetalert2';
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -24,7 +22,7 @@ const CourseDetail = () => {
   //Get token
   const token = sessionStorage.getItem("token")
 
-  //State courseDetails 6 GET
+  //State courseDetails & GET
   const [courseDetails, setCourseDetails] = useState({})
 
   let {subject} = useParams()
@@ -45,15 +43,23 @@ const CourseDetail = () => {
   
 
   //Get outstanding student
-  //const [ bestStudent, setBestStudent ] = useState({})
   const getBest =()=>{
     axios(`http://localhost:3000/api/students/outstanding?subject=${courseDetails.subject}`, {headers:{'token': token}})
     .then((data)=>{
-      //setBestStudent(data.data)
       if(!data.data) {
-        alert('No hay nigun alumno.')
+        Swal.fire({
+          title: 'Error!',
+          text: 'No hay ningun alumno en el curso',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        })
       } else {
-        alert(`El alumno destacado fue ${data.data.name} ${data.data.surname} y su nota fue ${data.data.grade}`)
+        Swal.fire({
+          title: 'The BEST!',
+          text: `El alumno destacado fue ${data.data.name} ${data.data.surname} y su nota fue ${data.data.grade}`,
+          icon: 'success',
+          confirmButtonText: 'Aceptar'
+        })
       }
     })
     .catch(error=>{
@@ -64,7 +70,6 @@ const CourseDetail = () => {
       console.log(error);
     })
   }
-
 
   //Token validation
   if(!token){
@@ -109,6 +114,9 @@ const CourseDetail = () => {
             <Typography variant="h5" align="center" color="text.secondary" paragraph>
               Alumnos
             </Typography>
+            {courseDetails.students?.length === 0 && <Typography variant="h6" align="center" color="text.secondary" paragraph>
+              No hay ningún alumno ingresado
+            </Typography>}
             <List
               sx={{
                 width: '100%',

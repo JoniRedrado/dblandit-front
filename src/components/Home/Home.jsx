@@ -21,6 +21,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Navigate } from 'react-router-dom';
 
+import Swal from 'sweetalert2';
+
 const defaultTheme = createTheme();
 
 export default function Home() {
@@ -48,6 +50,11 @@ export default function Home() {
   const deleteCourse = (subject)=>{
     axios.delete(`http://localhost:3000/api/courses/subject/${subject}`, {headers:{'token': token}})
       .then(res=>{
+        Swal.fire(
+          'Good job!',
+          'Curso eliminado con exito!',
+          'success'
+        )
         console.log(res);
       })
       .catch(error=>{
@@ -145,7 +152,7 @@ export default function Home() {
         </Box>
         <Container sx={{ py: 8 }} maxWidth="md">
           
-          <Grid component="form" onSubmit={filter}  noValidate sx={{ mt: 1, display: "flex", justifyContent: "space-around", py:"2rem" }}>
+          <Grid component="form" onSubmit={filter}  noValidate sx={{ mt: 1, display: "flex", flexWrap:"wrap", justifyContent: "space-around", py:"2rem" }}>
             <TextField
               margin="normal"
               value={filters.duration}

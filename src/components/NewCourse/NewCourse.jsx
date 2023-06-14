@@ -12,7 +12,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
 import { Navigate } from 'react-router-dom';
 
-
+import Swal from 'sweetalert2';
 
 const defaultTheme = createTheme();
 
@@ -39,11 +39,22 @@ export default function NewCourse() {
     axios.post('http://localhost:3000/api/courses', inputs, {headers:{'token': token}})
     .then(res=>{
         console.log(res)
+        Swal.fire(
+          'Good job!',
+          'Curso agregado con exito!',
+          'success'
+        )
       })
       .catch(error=>{
         if (error.response.status === 401){
           sessionStorage.clear()
           return (<Navigate to='/login'/>)
+        } else {
+          Swal.fire(
+            'Ups!',
+            'No se pudo agregar el curso!',
+            'error'
+          )
         }
         console.log(error);
       })

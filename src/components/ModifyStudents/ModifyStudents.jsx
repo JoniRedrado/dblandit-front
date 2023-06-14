@@ -19,6 +19,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Navigate, useParams } from 'react-router-dom';
 
+import Swal from 'sweetalert2';
+
 const defaultTheme = createTheme();
 
 const ModifyStudents = () => {
@@ -43,6 +45,12 @@ const ModifyStudents = () => {
     if(e !== null) e.preventDefault()
     axios.delete(`http://localhost:3000/api/students?subject=${subject}&documentNumber=${dni}`,  {headers:{'token': token}})
       .then(res=>{
+        Swal.fire({
+          title: 'Success',
+          text: `Alumno eliminado con exito`,
+          icon: 'success',
+          confirmButtonText: 'Aceptar'
+        })
         console.log(res);
       })
       .catch(error=>{
@@ -50,7 +58,12 @@ const ModifyStudents = () => {
           sessionStorage.clear()
           return (<Navigate to='/login'/>)
         }
-        console.log(error);
+        Swal.fire({
+          title: 'Error',
+          text: `No se pudo eliminar al alumno`,
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        })
       })
     setDocumentNumber("")
   }
@@ -67,7 +80,22 @@ const ModifyStudents = () => {
 
   const addStudent = (e)=>{
     e.preventDefault()
+    let error = false
+    
+    for (const key in newStudent) {
+      if (newStudent[key].length === 0) {
+        error=true
+      }
+    }
 
+    if(error) {
+      return(Swal.fire({
+        title: 'Error',
+        text: `Todos los campos deben estar completos`,
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      }))
+    }
     axios.post('http://localhost:3000/api/students', {subject: courseDetails.subject, data:{...newStudent}}, {headers:{'token': token}})
       .then(res=>{
         console.log(res);
@@ -78,13 +106,24 @@ const ModifyStudents = () => {
           documentNumber: "",
           grade: "",
         })
+        Swal.fire({
+          title: 'Success',
+          text: `Alumno agregado con exito`,
+          icon: 'success',
+          confirmButtonText: 'Aceptar'
+        })
       })
       .catch(error=>{
         if (error.response.status === 401){
           sessionStorage.clear()
           return (<Navigate to='/login'/>)
         }
-        console.log(error);
+        Swal.fire({
+          title: 'Error',
+          text: `No se pudo agregar al alumno`,
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        })
       })
   }
 
@@ -104,9 +143,6 @@ const ModifyStudents = () => {
     
   },[deleteStudent, addStudent])
 
-  const goBack = ()=>{
-    return(<Navigate to={`/courses`} />)
-  }
 
   if(!token){
     return(
